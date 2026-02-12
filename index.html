@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【昶青集團】資產設備管理AI系統</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            /* Soft Blue */
+            --secondary-color: #50E3C2;
+            /* Mint Green */
+            --accent-color: #FF6B6B;
+            /* Soft Red/Coral */
+            --bg-color: #F7F9FC;
+            /* Very Light Blue-Grey */
+            --card-bg: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Header */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary-color);
+        }
+        .logo-area i {
+            font-size: 1.8rem;
+        }
+        .logo-area h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .search-bar {
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+        }
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 12px 12px 45px;
+            border: 1px solid #E0E6ED;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4A90E2 0%, #50E3C2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 1;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-card h2 {
+            margin-bottom: 25px;
+            color: var(--text-primary);
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E0E6ED;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: #357ABD;
+        }
+        .login-btn:disabled {
+            background: #BDC3C7;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 15px;
+            font-size: 0.9em;
+            min-height: 20px;
+        }
+        /* Navigation Tabs */
+        .sheet-nav {
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .tabs-list {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            padding: 5px;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            border-radius: 6px 6px 0 0;
+        }
+        .tab-button:hover {
+            color: var(--primary-color);
+            background-color: rgba(74, 144, 226, 0.05);
+        }
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 700;
+        }
+        /* Content Area */
+        .content-area {
+            position: relative;
+            flex: 1;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        /* Card Design */
+        .data-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(74, 144, 226, 0.2);
+        }
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background-color: #f0f2f5;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card-image:hover img {
+            transform: scale(1.05);
+        }
+        .card-image-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: #BDC3C7;
+            font-size: 3rem;
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .item-badge {
+            background: rgba(80, 227, 194, 0.15);
+            color: #27AE60;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .item-id {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            background: #f0f2f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .item-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        .item-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #95A5A6;
+            margin-bottom: 2px;
+        }
+        .detail-value {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .card-footer {
+            padding: 15px 20px;
+            background: #FAFAFA;
+            border-top: 1px solid #F0F0F0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-green {
+            background-color: #2ECC71;
+        }
+        .status-red {
+            background-color: #E74C3C;
+        }
+        .status-gray {
+            background-color: #BDC3C7;
+        }
+        /* Modal */
+        .modal {
+            display: flex;
+            position: fixed;
+            z-index: 2500;
+            /* Higher than login overlay if needed, but login should block all */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        .modal.hidden {
+            display: none;
+            opacity: 0;
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Loading & Empty States */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+        .loading-overlay.hidden,
+        .no-results.hidden {
+            display: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .main-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-bar {
+                max-width: 100%;
+            }
+            .logout-btn {
+                /* On mobile, full width or icon only? Let's keep text */
+                width: auto;
+            }
+        }
+        .logout-btn {
+            padding: 10px 20px;
+            background-color: white;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .logout-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        /* --- AI Voice Avatar UI --- */
+        .avatar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 20px 10px;
+            background: linear-gradient(to bottom, var(--primary-color), #f9f9f9);
+            border-radius: 16px 16px 0 0;
+            position: relative;
+        }
+        .avatar-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
+        .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(74, 144, 226, 0.4);
+            z-index: 1;
+            opacity: 0;
+        }
+        /* State: Speaking */
+        .avatar-wrapper.speaking img {
+            transform: scale(1.1);
+            border-color: #50E3C2;
+        }
+        .avatar-wrapper.speaking .pulse-ring {
+            animation: pulse-animation 1.5s infinite;
+            background: rgba(80, 227, 194, 0.4);
+        }
+        /* State: Listening */
+        .avatar-wrapper.listening img {
+            border-color: #ff6b6b;
+        }
+        .avatar-wrapper.listening .pulse-ring {
+            animation: pulse-animation 1s infinite;
+            background: rgba(255, 107, 107, 0.4);
+        }
+        /* State: Thinking */
+        .avatar-wrapper.thinking img {
+            animation: bounce 1s infinite;
+        }
+        @keyframes pulse-animation {
+            0% {
+                width: 100%;
+                height: 100%;
+                opacity: 0.8;
+            }
+            100% {
+                width: 140%;
+                height: 140%;
+                opacity: 0;
+            }
+        }
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        .mic-btn {
+            background: white;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mic-btn:hover {
+            transform: scale(1.1);
+            color: var(--primary-color);
+        }
+        .mic-btn.active {
+            background: var(--accent-color);
+            color: white;
+            animation: pulse-red 1s infinite;
+        }
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+            }
+        }
+        /* Adjust Chat Body for new layout */
+        .chat-header {
+            display: none;
+            /* Hide old header */
+        }
+        /* New Close Button */
+        .close-chat-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            /* On primary bg */
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+        /* --- AI Assistant Chat UI --- */
+        .chat-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--primary-color);
+        }
+        .chat-fab:hover {
+            transform: scale(1.1);
+        }
+        .chat-fab img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+        .chat-window {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 380px;
+            height: 500px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transform-origin: bottom right;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+        .chat-window.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+        .chat-header {
+            padding: 15px 20px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #f9f9f9;
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .chat-message.bot {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #eee;
+            color: var(--text-primary);
+            border-radius: 12px 12px 12px 0;
+        }
+        .chat-message.user {
+            align-self: flex-end;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 12px 12px 0 12px;
+        }
+        .chat-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            background: white;
+            border-radius: 0 0 16px 16px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        .chat-send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .chat-send-btn:hover {
+            background: #357ABD;
+        }
+        .typing-indicator {
+            align-self: flex-start;
+            background: #eee;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: #777;
+            display: none;
+        }
+        @media (max-width: 480px) {
+            .chat-window {
+                width: 90%;
+                right: 5%;
+                bottom: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <div style="margin-bottom: 20px;">
+                <img src="logo1.png" alt="System Logo" style="height: 80px; width: auto;">
+            </div>
+            <h2>【昶青集團】<br>設備管理AI系統</h2>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>帳號 (Account)</label>
+                    <input type="text" id="username" required placeholder="請輸入帳號">
+                </div>
+                <div class="input-group">
+                    <label>密碼 (Password)</label>
+                    <input type="password" id="password" required placeholder="請輸入密碼">
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">登入</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="logo-area">
+                <img src="logo1.png" alt="Logo" style="height: 40px; width: auto;">
+                <h1>【昶青集團】資產設備管理AI系統</h1>
+            </div>
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="搜尋品項、編號或說明...">
+            </div>
+            <button id="logoutBtn" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> 登出
+            </button>
+        </header>
+        <nav class="sheet-nav">
+            <div id="loadingTabs" class="loading-spinner small"></div>
+            <ul id="sheetTabs" class="tabs-list">
+                <!-- Javascript will populate tabs here -->
+            </ul>
+        </nav>
+        <main class="content-area">
+            <div id="loadingData" class="loading-overlay hidden">
+                <div class="spinner"></div>
+                <p>載入資料中...</p>
+            </div>
+            <div id="cardGrid" class="card-grid">
+                <!-- Javascript will populate cards here -->
+            </div>
+            <div id="noResults" class="no-results hidden">
+                <i class="fa-regular fa-folder-open"></i>
+                <p>沒有找到符合的資料</p>
+            </div>
+        </main>
+    </div>
+    <!-- AI Assistant Chat -->
+    <div class="chat-fab" onclick="toggleChat()">
+        <img src="logo2.png" alt="AI Assistant">
+    </div>
+    <div class="chat-window" id="chatWindow">
+        <!-- New Avatar Header -->
+        <div class="avatar-container">
+            <button class="close-chat-btn" onclick="toggleChat()">&times;</button>
+            <div class="avatar-wrapper" id="avatarWrapper">
+                <img src="logo2.png" alt="Digital Human">
+                <div class="pulse-ring"></div>
+            </div>
+            <button class="mic-btn" id="micBtn" onclick="toggleListening()">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <p id="voiceStatus"
+                style="font-size: 0.8rem; color: rgba(255,155,155,0.9); margin-top: 5px; height: 1.2em;">點擊麥克風開始說話</p>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message bot">
+                你好！我是【昶青採購課數位專員Jennie】。<br>您可以點擊上方麥克風直接跟我對話，或在下方輸入文字。
+            </div>
+            <!-- Typing indicator exists in CSS but added dynamically via JS usually, ensuring structure -->
+            <div class="typing-indicator" id="typingIndicator">思考中...</div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" class="chat-input" id="chatInput" placeholder="輸入訊息..."
+                onkeypress="handleChatKey(event)">
+            <button class="chat-send-btn" onclick="sendChatMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    <!-- Modal for Image Preview -->
+    <div id="imageModal" class="modal hidden">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div id="caption"></div>
+    </div>
+    <script>
+        /**
+         * Config
+         * Replace this URL with your actual Google Apps Script Web App URL
+         */
+        const API_URL = 'https://script.google.com/macros/s/AKfycbycb5OSv191Ox73knv4X179IpHHqSt0134eCMWy3e_Glsbe3UctMj0BVCiyFOaOhuWYQQ/exec';
+        // State
+        let allSheets = [];
+        let currentData = [];
+        let currentOriginalData = []; // Store original data for filtering
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event Listeners
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                const btn = document.getElementById('loginBtn');
+                btn.disabled = false;
+                btn.textContent = '登入';
+            });
+            // Modal Close
+            document.querySelector('.close-modal').addEventListener('click', () => {
+                document.getElementById('imageModal').classList.add('hidden');
+            });
+            window.addEventListener('click', (event) => {
+                const modal = document.getElementById('imageModal');
+                if (event.target == modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            // Tab clicks (Delegation)
+            document.getElementById('sheetTabs').addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-button')) {
+                    switchTab(e.target.dataset.sheet);
+                }
+            });
+        });
+        async function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('loginError');
+            if (!API_URL || API_URL.includes('YOUR_GOOGLE_APPS_SCRIPT')) {
+                errorMsg.textContent = '請先設定後端 API URL！';
+                return;
+            }
+            btn.disabled = true;
+            btn.textContent = '驗證中...';
+            errorMsg.textContent = '';
+            try {
+                // Call Backend to verify
+                const response = await fetch(`${API_URL}?type=login&account=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`);
+                const data = await response.json();
+                if (data.status === 'success') {
+                    // Unlock UI
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    init(); // Start loading data
+                } else {
+                    errorMsg.textContent = '帳號或密碼錯誤，請重試。';
+                    btn.disabled = false;
+                    btn.textContent = '登入';
+                }
+            } catch (err) {
+                console.error(err);
+                errorMsg.textContent = '連線失敗，請檢查網路或 API。';
+                btn.disabled = false;
+                btn.textContent = '登入';
+            }
+        }
+        async function init() {
+            await fetchSheets();
+        }
+        /**
+         * Fetch list of sheets (tabs)
+         */
+        async function fetchSheets() {
+            const tabsContainer = document.getElementById('sheetTabs');
+            const loadingTabs = document.getElementById('loadingTabs');
+            try {
+                let sheets = [];
+                if (!API_URL || API_URL.includes('YOUR_GOOGLE_APPS_SCRIPT')) {
+                    const grid = document.getElementById('cardGrid');
+                    grid.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <i class="fa-solid fa-link-slash" style="font-size: 48px; margin-bottom: 20px; color: var(--accent-color);"></i>
+                            <h2>尚未連接後端資料庫</h2>
+                            <p style="margin: 10px 0;">請完成 Google Apps Script 部署，並填入 Web App URL。</p>
+                            <p style="font-size: 0.9em; color: #95A5A6;">(請參考部署指南 walkthrough.md)</p>
+                        </div>
+                    `;
+                    loadingTabs.classList.add('hidden');
+                    return;
+                }
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                if (data.status === 'success' && data.type === 'list') {
+                    sheets = data.data;
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+                allSheets = sheets;
+                renderTabs(sheets);
+                if (sheets.length > 0) {
+                    switchTab(sheets[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching sheets:", error);
+                const grid = document.getElementById('cardGrid');
+                grid.innerHTML = `
+                     <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fa-solid fa-circle-exclamation" style="font-size: 48px; margin-bottom: 20px; color: var(--accent-color);"></i>
+                        <h2>無法讀取資料</h2>
+                        <p>請確認您的 Google Apps Script 是否已部署，且權限設為「任何人 (Anyone)」。</p>
+                        <p style="font-size: 0.8em; margin-top: 10px; color: #BDC3C7;">${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                loadingTabs.classList.add('hidden');
+            }
+        }
+        function renderTabs(sheets) {
+            const tabsContainer = document.getElementById('sheetTabs');
+            tabsContainer.innerHTML = '';
+            sheets.forEach(sheetName => {
+                const li = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.className = 'tab-button';
+                btn.dataset.sheet = sheetName;
+                btn.textContent = sheetName;
+                li.appendChild(btn);
+                tabsContainer.appendChild(li);
+            });
+        }
+        async function switchTab(sheetName) {
+            // Update Active Tab
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.sheet === sheetName);
+            });
+            const loadingData = document.getElementById('loadingData');
+            const grid = document.getElementById('cardGrid');
+            loadingData.classList.remove('hidden');
+            grid.innerHTML = '';
+            try {
+                let data = [];
+                if (API_URL && !API_URL.includes('YOUR_GOOGLE_APPS_SCRIPT')) {
+                    const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent(sheetName)}`);
+                    const json = await response.json();
+                    if (json.status === 'success' && json.type === 'data') {
+                        data = json.data;
+                    }
+                }
+                currentOriginalData = data;
+                currentData = data;
+                renderGrid(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                grid.innerHTML = '<p class="error-msg">載入失敗，請重試。</p>';
+            } finally {
+                loadingData.classList.add('hidden');
+            }
+        }
+        function renderGrid(data) {
+            const grid = document.getElementById('cardGrid');
+            const noResults = document.getElementById('noResults');
+            grid.innerHTML = '';
+            if (!data || data.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            noResults.classList.add('hidden');
+            data.forEach(item => {
+                const card = createCard(item);
+                grid.appendChild(card);
+            });
+        }
+        function createCard(item) {
+            const article = document.createElement('article');
+            article.className = 'data-card';
+            // Image logic
+            let rawImg = item['照片'];
+            let driveId = null;
+            if (rawImg) {
+                driveId = extractDriveId(String(rawImg));
+            }
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'card-image';
+            if (driveId) {
+                const img = document.createElement('img');
+                // Strategy 1: "lh3" link (Best for galleries)
+                const primayUrl = `https://lh3.googleusercontent.com/d/${driveId}`;
+                // Strategy 2: "thumbnail" link (fallback)
+                const fallbackUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`;
+                img.src = primayUrl;
+                img.alt = item['品項名稱'];
+                img.loading = 'lazy';
+                img.referrerPolicy = 'no-referrer';
+                // Self-healing: if primary fails, try fallback
+                img.onerror = function () {
+                    if (this.src === primayUrl) {
+                        console.warn('Primary image failed, switching to fallback:', driveId);
+                        this.src = fallbackUrl;
+                    } else {
+                        // Both failed
+                        this.parentElement.innerHTML = '<div class="card-image-placeholder"><i class="fa-solid fa-triangle-exclamation"></i></div>';
+                    }
+                };
+                img.onclick = () => openModal(img.src, item['品項名稱']);
+                imageContainer.appendChild(img);
+            } else {
+                imageContainer.innerHTML = '<div class="card-image-placeholder"><i class="fa-regular fa-image"></i></div>';
+            }
+            // Status logic (Example based on '使用情形')
+            let statusClass = 'status-green';
+            if (item['使用情形'] && item['使用情形'].includes('異常')) statusClass = 'status-red';
+            if (item['使用情形'] && item['使用情形'].includes('閒置')) statusClass = 'status-gray';
+            const content = `
+                <div class="card-content">
+                    <div class="card-header">
+                        <span class="item-badge">${item['屬性'] || '資產'}</span>
+                        <span class="item-id">#${item['編號']}</span>
+                    </div>
+                    <h3 class="item-title">${item['品項名稱'] || '未命名項目'}</h3>
+                    <div class="item-details">
+                        <div class="detail-row">
+                            <span class="detail-label">採購編碼</span>
+                            <span class="detail-value">${item['採購編碼'] || '-'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">部門</span>
+                            <span class="detail-value">${item['部門別'] || '-'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">存放處</span>
+                            <span class="detail-value">${item['存放處'] || '-'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">數量</span>
+                            <span class="detail-value">${item['數量'] || '0'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="status-wrap">
+                        <span class="status-indicator ${statusClass}"></span>
+                        ${item['使用情形'] || '未知狀態'} · ${item['自有或租賃'] || ''}
+                    </div>
+                </div>
+            `;
+            article.appendChild(imageContainer);
+            article.innerHTML += content;
+            return article;
+        }
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            if (!query) {
+                renderGrid(currentOriginalData);
+                return;
+            }
+            const filtered = currentOriginalData.filter(item => {
+                // Search in specific fields
+                const searchFields = [
+                    item['品項名稱'],
+                    item['編號'],
+                    item['說明'],
+                    item['採購編碼'],
+                    item['存放處']
+                ];
+                return searchFields.some(field =>
+                    field && field.toString().toLowerCase().includes(query)
+                );
+            });
+            renderGrid(filtered);
+        }
+        function openModal(src, captionText) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const caption = document.getElementById('caption');
+            modal.classList.remove('hidden');
+            modalImg.src = src;
+            caption.textContent = captionText;
+        }
+        /**
+         * Helper to extract Google Drive ID from various URL formats
+         */
+        function extractDriveId(url) {
+            if (!url) return null;
+            // 1. Check for standard ID pattern in URL (alphanumeric + - _)
+            // Matches: /d/ID, id=ID, or simply the ID if the input is just the ID
+            const idRegex = /[-\w]{25,}/;
+            const match = url.match(/\/d\/([-\w]{25,})/) || url.match(/id=([-\w]{25,})/) || url.match(idRegex);
+            if (match) {
+                return match[1] || match[0];
+            }
+            return null;
+        }
+        /* --- Chat & Voice Functions --- */
+        let recognition = null;
+        let isListening = false;
+        let currentAudio = null;
+        // Initialize Speech Recognition
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'zh-TW';
+            recognition.onstart = () => {
+                isListening = true;
+                updateVoiceState('listening', '正在聽您說話...');
+                document.getElementById('micBtn').classList.add('active');
+            };
+            recognition.onend = () => {
+                // Determine if we stopped due to result or silence
+                // If isListening is still true (meaning checking ended but no result or manual stop), reset
+                if (isListening) {
+                    // Often onend fires after onresult, let onresult handle the UI change if successful
+                    // If manual stop or timeout, we reset here
+                    if (document.getElementById('voiceStatus').innerText === '正在聽您說話...') {
+                        resetVoiceUI();
+                    }
+                }
+            };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                resetVoiceUI();
+                // Put text in input for visibility
+                document.getElementById('chatInput').value = transcript;
+                // Auto send
+                sendChatMessage();
+            };
+            recognition.onerror = (event) => {
+                console.error('Speech Error:', event.error);
+                resetVoiceUI();
+                updateVoiceState(null, '語音辨識錯誤');
+            };
+        } else {
+            document.getElementById('micBtn').style.display = 'none'; // Hide if not supported
+        }
+        function toggleListening() {
+            if (!recognition) {
+                alert('您的瀏覽器不支援語音功能');
+                return;
+            }
+            // If audio playing, stop it
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+                resetVoiceUI();
+                return;
+            }
+            if (isListening) {
+                recognition.stop();
+                resetVoiceUI();
+            } else {
+                recognition.start();
+            }
+        }
+        function updateVoiceState(state, text) {
+            const avatarWrapper = document.getElementById('avatarWrapper');
+            const statusText = document.getElementById('voiceStatus');
+            // Classes: listening, speaking, thinking
+            avatarWrapper.className = 'avatar-wrapper ' + (state || '');
+            if (text) statusText.innerText = text;
+        }
+        function resetVoiceUI() {
+            isListening = false;
+            document.getElementById('micBtn').classList.remove('active');
+            updateVoiceState('', '點擊麥克風開始說話');
+        }
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.classList.toggle('active');
+            // If closing, stop audio
+            if (!chatWindow.classList.contains('active')) {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+                resetVoiceUI();
+            } else {
+                document.getElementById('chatInput').focus();
+            }
+        }
+        function handleChatKey(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            const chatBody = document.getElementById('chatBody');
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (!message) return;
+            // Stop audio if playing
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            // UI Updates
+            appendMessage(message, 'user');
+            input.value = '';
+            typingIndicator.style.display = 'block';
+            chatBody.scrollTop = chatBody.scrollHeight;
+            updateVoiceState('thinking', '思考中...');
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ type: 'chat', message: message })
+                });
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error('Backend returned invalid format');
+                }
+                typingIndicator.style.display = 'none';
+                updateVoiceState('', '點擊麥克風開始說話');
+                if (data.status === 'success') {
+                    appendMessage(data.reply, 'bot');
+                    // 2. Fetch Audio in background (Async)
+                    fetchAudioAndPlay(data.reply);
+                } else {
+                    appendMessage('系統錯誤: ' + (data.message || '未知原因'), 'bot');
+                }
+            } catch (error) {
+                console.error('Chat Error:', error);
+                typingIndicator.style.display = 'none';
+                updateVoiceState('', '連線失敗');
+                appendMessage('連線失敗，請檢查網路。', 'bot');
+            }
+        }
+        async function fetchAudioAndPlay(text) {
+            // Don't generate audio for error messages
+            if (text.startsWith('AI 連線失敗') || text.startsWith('AI 連線錯誤')) return;
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ type: 'tts', text: text })
+                });
+                const data = await response.json();
+                if (data.status === 'success' && data.audioData) {
+                    playAudio(data.audioData);
+                } else {
+                    console.warn('TTS fetch failed or no audio returned');
+                }
+            } catch (e) {
+                console.error('TTS Network Error:', e);
+            }
+        }
+        function playAudio(base64Data) {
+            if (currentAudio) currentAudio.pause();
+            updateVoiceState('speaking', 'AI 說話中...');
+            currentAudio = new Audio("data:audio/mp3;base64," + base64Data);
+            currentAudio.onended = () => {
+                currentAudio = null;
+                resetVoiceUI();
+            };
+            currentAudio.play().catch(e => {
+                console.warn('Audio play failed (Autoplay policy?):', e);
+                updateVoiceState('', '點擊麥克風開始說話');
+            });
+        }
+        function appendMessage(text, sender) {
+            const chatBody = document.getElementById('chatBody');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-message ${sender}`;
+            // Use marked to parse markdown
+            // Configure marked to break on single newlines if desired, but default is fine
+            if (sender === 'bot') {
+                msgDiv.innerHTML = marked.parse(text);
+            } else {
+                msgDiv.textContent = text; // User message kept as plain text to avoid weird parsing of user input
+            }
+            // Insert before typing indicator
+            chatBody.insertBefore(msgDiv, typingIndicator);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>
